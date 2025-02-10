@@ -55,5 +55,16 @@ namespace ProductModel
         {
             context.Dispose();
         }
+
+        public Product UpdateReorderLevel(int id, int reorderLevel)
+        {
+            var p = context.Products.Find(id);
+            if (p != null)
+            {
+                p.ReorderLevel = reorderLevel;
+                return p;
+            }
+            return null;
+        }
     }
 }
