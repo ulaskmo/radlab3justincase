@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProductModel
 {
     public class ProductRepository : IProduct<Product>, IDisposable
     {
-        ProductDBContext context = new ProductDBContext();
+        private readonly ProductDBContext context;
 
         public ProductRepository(ProductDBContext context)
         {
@@ -19,36 +17,40 @@ namespace ProductModel
         public void Add(Product entity)
         {
             context.Products.Add(entity);
+            context.SaveChanges();
         }
 
         public void AddRange(IEnumerable<Product> entities)
         {
-            context.AddRange(entities);
+            context.Products.AddRange(entities);
+            context.SaveChanges();
         }
 
         public IEnumerable<Product> Find(Expression<Func<Product, bool>> predicate)
         {
-            return context.Products.Find(predicate) as IEnumerable<Product>;
+            return context.Products.Where(predicate).ToList();
         }
 
         public Product Get(int id)
         {
-            return context.Products.Find(id);
+            return context.Products.FirstOrDefault(p => p.ID == id);
         }
 
         public IEnumerable<Product> GetAll()
         {
-            return context.Products;
+            return context.Products.ToList();
         }
 
         public void Remove(Product entity)
         {
             context.Products.Remove(entity);
+            context.SaveChanges();
         }
 
         public void RemoveRange(IEnumerable<Product> entities)
         {
             context.Products.RemoveRange(entities);
+            context.SaveChanges();
         }
 
         public void Dispose()
@@ -58,11 +60,12 @@ namespace ProductModel
 
         public Product UpdateReorderLevel(int id, int reorderLevel)
         {
-            var p = context.Products.Find(id);
-            if (p != null)
+            var product = context.Products.FirstOrDefault(p => p.ID == id);
+            if (product != null)
             {
-                p.ReorderLevel = reorderLevel;
-                return p;
+                product.ReorderLevel = reorderLevel;
+                context.SaveChanges();
+                return product;
             }
             return null;
         }

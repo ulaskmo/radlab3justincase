@@ -1,4 +1,4 @@
-
+using Microsoft.EntityFrameworkCore;
 using ProductModel;
 
 namespace ProductWebAPI2025
@@ -9,17 +9,17 @@ namespace ProductWebAPI2025
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddDbContext<ProductDBContext>();
+            // Register SQLite Database
+            builder.Services.AddDbContext<ProductDBContext>(options =>
+                options.UseSqlite("Data Source=../ProductModel/ProductCoreDB-2025.db"));
+
             builder.Services.AddTransient<IProduct<Product>, ProductRepository>();
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -27,10 +27,7 @@ namespace ProductWebAPI2025
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();
