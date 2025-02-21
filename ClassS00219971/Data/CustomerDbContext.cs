@@ -7,9 +7,9 @@ namespace ClassS00219971.Data
     {
         public DbSet<Customer> Customers { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        // ✅ Fix: Add a constructor that accepts DbContextOptions
+        public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options)
         {
-            optionsBuilder.UseSqlite("Data Source=../ClassS00219971/CustomerCorDB-S00219971.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

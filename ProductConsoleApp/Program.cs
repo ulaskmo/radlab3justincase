@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using ClassS00219971.Data;
 using ClassS00219971.Models;
 
@@ -7,29 +9,28 @@ class Program
 {
     static void Main()
     {
-        using var context = new CustomerDbContext();
+        // ✅ Set up dependency injection for DbContext
+        var serviceProvider = new ServiceCollection()
+            .AddDbContext<CustomerDbContext>(options =>
+                options.UseSqlite("Data Source=../ClassS00219971/CustomerCorDB-S00219971.db"))
+            .BuildServiceProvider();
 
-        // List all customers
+        using var context = serviceProvider.GetRequiredService<CustomerDbContext>();
+
+        // ✅ List all customers
         var customers = context.Customers.ToList();
         Console.WriteLine("All Customers:");
         foreach (var customer in customers)
         {
-            Console.WriteLine($"{customer.Id}: {customer.Name}, {customer.Address}, Credit: €{customer.CreditRating}");
+            Console.WriteLine($"ID: {customer.Id}, Name: {customer.Name}, Address: {customer.Address}, Credit: {customer.CreditRating}");
         }
 
-        // Customers with Credit Rating > 400
+        // ✅ Customers with Credit Rating > 400
         var highCreditCustomers = context.Customers.Where(c => c.CreditRating > 400).ToList();
         Console.WriteLine("\nCustomers with Credit Rating > 400:");
         foreach (var customer in highCreditCustomers)
         {
-            Console.WriteLine($"{customer.Name}, Credit: €{customer.CreditRating}");
+            Console.WriteLine($"Name: {customer.Name}, Credit: {customer.CreditRating}");
         }
-
-        // Add new customer
-        var maxId = context.Customers.Max(c => c.Id) + 1;
-        var newCustomer = new Customer { Id = maxId, Name = "New Customer", Address = "New Address", CreditRating = 1000 };
-        context.Customers.Add(newCustomer);
-        context.SaveChanges();
-        Console.WriteLine("\nNew Customer Added.");
     }
 }

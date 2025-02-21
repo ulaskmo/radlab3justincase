@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProductModel;
+using ClassS00219971.Data;
 
 namespace ProductWebAPI2025
 {
@@ -12,6 +13,10 @@ namespace ProductWebAPI2025
             // Register SQLite Database
             builder.Services.AddDbContext<ProductDBContext>(options =>
                 options.UseSqlite("Data Source=../ProductModel/ProductCoreDB-2025.db"));
+            
+            // ✅ Register CustomerDbContext
+            builder.Services.AddDbContext<CustomerDbContext>(options =>
+                options.UseSqlite("Data Source=../ClassS00219971/CustomerCorDB-S00219971.db"));
 
             builder.Services.AddTransient<IProduct<Product>, ProductRepository>();
             builder.Services.AddControllers();
